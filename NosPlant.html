@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+    <title>Boutique de plantes</title>
+    <style>        
+.best-plants {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .plant-box {
+            flex: 0 0 calc(33.33% - 20px); /* Pour afficher trois plantes par ligne avec un espace de 20px entre elles */
+            margin: 10px;
+            text-align: center;
+        }
+
+        .plant-box img {
+            width: 300px; /* Ajustez cette valeur à la taille souhaitée */
+            height: 300px;
+border-radius: 8%;
+            object-fit: cover; /* Pour conserver le ratio d'aspect de l'image */
+        }
+    </style>
+</head>
+
+<body>
+    <section id="home" class="home-container2">
+        <header id="header" class="header">
+            <img src="images/logo.png" alt="Nature Sabah" class="logo">
+            <ul class="nav-links">
+                <li>
+                    <a href="index.html" data-text="Accueil">Accueil</a>
+                </li>
+                <li>
+                    <a href="index.html#best-sales" data-text="Nos meilleures ventes">Nos meilleures ventes</a>
+                </li>
+                <li>
+                    <a href="index.html#plants" data-text="Récent plantes">Récent plantes</a>
+                </li>                
+		<li>
+                    <a href="NosPlant.html" data-text="Nos plantes">Nos plantes</a>
+                </li>
+		<li>
+                    <a href="ajoutPlant.html" data-text="Ajout plantes">Ajout plantes</a>
+                </li>
+            </ul>
+            <div class="burger-container">
+                <div class="burger"></div>
+            </div>
+        </header>
+
+    </section>
+    <section id="plants" class="plants-container">
+
+        <h1 class="section-title">Nos plantes</h1>
+        <div id="plantContainer" class="best-plants">
+            <!-- Vos plantes seront générées ici -->
+        </div>
+    </section>
+
+    <div id="plantPopup" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" onclick="hidePopup()">&times;</span>
+            <h2 id="popup-plant-name"></h2>
+            <img id="popup-plant-image" src="" alt="Image de la plante">
+            <p id="popup-plant-description"></p>
+            <h3 id="popup-plant-price"></h3>
+            <p id="popup-plant-availability"></p>
+            <p id="popup-plant-quantity"></p>
+        <button class="btn-commander" onclick="openCommandePopup()">Commander</button>
+
+
+        </div>
+    </div>
+
+    <footer id="footer" class="footer">
+        <span class="copyrights">&copy; 2023 - Nature Sabah</span>
+        <a href="#" class="conditions">Condition générales de vente</a>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script>
+    <script>
+        const burgerContainer = document.querySelector('.burger-container');
+        const navLinks = document.querySelector('.nav-links');
+	let selectedPlant = null;
+
+         const firebaseConfig = {
+            // Your Firebase config details here
+  		apiKey: "AIzaSyCXBf41eq-hulIWrHI6d8m3VS9Lu4ZO3ew",
+  		authDomain: "sabahnature-79356.firebaseapp.com",
+  		databaseURL: "https://sabahnature-79356-default-rtdb.firebaseio.com",
+  		projectId: "sabahnature-79356",
+  		storageBucket: "sabahnature-79356.appspot.com",
+  		messagingSenderId: "192139262635",
+  		appId: "1:192139262635:web:e2c8ba4e8928b3fab5d5ee",
+  		measurementId: "G-TK1TWMJ88B"
+
+        };
+
+        // Initialisez Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Récupérez une instance de la base de données Firebase Realtime
+        const db = firebase.database();
+	
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const plantContainer = document.getElementById('plantContainer');
+
+	db.ref('plants').on('value', (snapshot) => {
+            plantContainer.innerHTML = ''; // Clear existing data
+            snapshot.forEach((childSnapshot) => {
+                const plante = childSnapshot.val();
+                const plantBox = document.createElement('div');
+                plantBox.className = 'plant-box';
+		plantBox.onclick = () => showPopup(plante);
+		
+		const plantImage = document.createElement('img');
+                plantImage.src = plante.image;
+                plantImage.alt = `Image de ${plante.name}`;
+
+                const plantName = document.createElement('h1');
+                plantName.className = 'plant-name';
+                plantName.textContent = plante.name;
+
+                const plantPrice = document.createElement('h3');
+                plantPrice.className = 'plant-price';
+                plantPrice.textContent = plante.price;
+
+                plantBox.appendChild(plantImage);
+                plantBox.appendChild(plantName);
+                plantBox.appendChild(plantPrice);
+                plantContainer.appendChild(plantBox);
+            });
+        });
+
+});
+
+     burgerContainer.addEventListener('click', () => {
+            burgerContainer.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+
+        function showPopup(plante) {
+            const popup = document.getElementById('plantPopup');
+            const popupName = document.getElementById('popup-plant-name');
+            const popupImage = document.getElementById('popup-plant-image');
+            const popupDescription = document.getElementById('popup-plant-description');
+            const popupPrice = document.getElementById('popup-plant-price');
+            const popupAvailability = document.getElementById('popup-plant-availability');
+            const popupQuantity = document.getElementById('popup-plant-quantity');
+
+            popupName.textContent = plante.name;
+            popupImage.src = plante.image;
+            popupDescription.textContent = plante.description;
+            popupPrice.textContent = `Prix : ${plante.price}`;
+            popupAvailability.textContent = `Disponibilité : ${plante.available ? 'Disponible' : 'Indisponible'}`;
+            popupQuantity.textContent = `Nombre d'exemplaires disponibles : ${plante.quantity}`;
+	    popupImage.classList.add('popup-image');
+	     selectedPlant = plante;
+            popup.style.display = 'block';
+        }
+
+        function hidePopup() {
+            const popup = document.getElementById('plantPopup');
+            popup.style.display = 'none';
+        }
+      function openCommandePopup() {
+            if (selectedPlant) {
+        // Use selectedPlant to access the selected plant data
+        const plantName = selectedPlant.name;
+        const plantPrice = selectedPlant.price;
+        const plantAvailability = selectedPlant.available ? 'Disponible' : 'Indisponible';
+        const plantQuantity = selectedPlant.quantity;
+
+        // Construct the query parameters string
+        const queryParams = `name=${encodeURIComponent(plantName)}&price=${encodeURIComponent(plantPrice)}&availability=${encodeURIComponent(plantAvailability)}&quantity=${encodeURIComponent(plantQuantity)}`;
+
+        // Construct the full URL with query parameters
+        const commandeURL = `commande.html?${queryParams}`;
+
+        // Open the new window with the commande.html page
+        window.open(commandeURL, "Commande Popup", "width=500,height=500");
+    }
+    }
+
+    </script>
+</body>
+
+</html>

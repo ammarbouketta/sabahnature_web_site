@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Commande</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="form-container">
+        <h2>Formulaire de Commande</h2>
+        <form id="plant-order-form">
+            <div class="form-group">
+                <label for="name">Nom / الاسم:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Adresse / العنوان:</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Numéro de téléphone / رقم الهاتف:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantité / الكمية:</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+            </div>
+
+                    <button type="submit" class="btn-commander">Commander / أطلب</button>
+
+        </form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            // Your Firebase config here
+            // Your Firebase config details here
+  apiKey: "AIzaSyCXBf41eq-hulIWrHI6d8m3VS9Lu4ZO3ew",
+  authDomain: "sabahnature-79356.firebaseapp.com",
+  databaseURL: "https://sabahnature-79356-default-rtdb.firebaseio.com",
+  projectId: "sabahnature-79356",
+  storageBucket: "sabahnature-79356.appspot.com",
+  messagingSenderId: "192139262635",
+  appId: "1:192139262635:web:e2c8ba4e8928b3fab5d5ee",
+  measurementId: "G-TK1TWMJ88B"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the Firebase Realtime Database
+        const db = firebase.database();
+
+        // Function to handle form submission
+        document.getElementById('plant-order-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const form = event.target;
+	    const queryParams = getQueryParams();
+
+        // Access the plant data from the queryParams object
+           const plantName = queryParams.name;
+           const plantPrice = queryParams.price;
+           const plantAvailability = queryParams.availability;
+           const plantQuantity = queryParams.quantity;
+            const cmd = {
+                name: form.elements.name.value,
+                address: form.elements.address.value,
+                phone: form.elements.phone.value,
+                quantity: parseInt(form.elements.quantity.value),
+		pname:plantName ,
+		price:plantPrice,
+		traiter:"non",
+                
+            };
+
+            // Add the plant data to the database
+            db.ref('commandes').push(cmd)
+                .then(() => {
+                    alert('Commande added successfully!');
+                    form.reset();
+                })
+                .catch((error) => {
+                    console.error('Error adding plant:', error);
+                    alert('Error adding plant. Please try again.');
+                });
+        });
+
+        function closePopupAndSubmit() {
+            // Ici, vous pouvez ajouter le code pour soumettre le formulaire si nécessaire
+            // ...
+
+            // Ensuite, fermez la fenêtre (popup) courante
+            window.close();
+        }
+
+        function getQueryParams() {
+            const search = window.location.search.substring(1);
+            const params = search.split('&').reduce((params, param) => {
+                const [key, value] = param.split('=');
+                params[key] = decodeURIComponent(value);
+                return params;
+            }, {});
+            return params;
+        }
+
+
+    </script>
+</body>
+</html>

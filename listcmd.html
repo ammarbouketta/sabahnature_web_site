@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des commandes</title>
+    <!-- Inclure les fichiers CSS de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .order-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .traiter {
+            background-color: #c3e6cb;
+        }
+        .non-traiter {
+            background-color: #f5c6cb;
+        }
+        .traiter-btn {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des commandes</h1>
+        <div id="ordersList"></div>
+    </div>
+
+    <!-- Inclure les scripts de Bootstrap et Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            // Your Firebase config here
+            // Your Firebase config details here
+  apiKey: "AIzaSyCXBf41eq-hulIWrHI6d8m3VS9Lu4ZO3ew",
+  authDomain: "sabahnature-79356.firebaseapp.com",
+  databaseURL: "https://sabahnature-79356-default-rtdb.firebaseio.com",
+  projectId: "sabahnature-79356",
+  storageBucket: "sabahnature-79356.appspot.com",
+  messagingSenderId: "192139262635",
+  appId: "1:192139262635:web:e2c8ba4e8928b3fab5d5ee",
+  measurementId: "G-TK1TWMJ88B"
+        };
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Fonction pour récupérer les commandes depuis Firebase
+        function getOrders() {
+            var ordersRef = firebase.database().ref('commandes');
+            ordersRef.orderByChild('timestamp').on('value', function(snapshot) {
+                var orders = snapshot.val();
+                var ordersList = document.getElementById('ordersList');
+                ordersList.innerHTML = ''; // Réinitialiser la liste à chaque mise à jour
+
+                for (var key in orders) {
+                    if (orders.hasOwnProperty(key)) {
+                        var order = orders[key];
+                        var orderItem = document.createElement('div');
+                        orderItem.classList.add('order-item');
+                        orderItem.classList.add(order.traiter === 'non' ? 'non-traiter' : 'traiter');
+                        orderItem.innerHTML = `
+                            <p><strong>Nom:</strong> ${order.name}</p>
+                            <p><strong>Adresse:</strong> ${order.address}</p>
+                            <p><strong>Téléphone:</strong> ${order.phone}</p>
+                            <p><strong>Quantité:</strong> ${order.quantity}</p>
+                            <p><strong>Plante:</strong> ${order.pname}</p>
+                            <p><strong>Prix:</strong> ${order.price}</p>
+                            <p><strong>Traité:</strong> ${order.traiter}</p>
+                            <button class="btn btn-success traiter-btn" onclick="updateTraitement('${key}', '${order.traiter}')">
+                                Marquer comme traité
+                            </button>
+                        `;
+                        ordersList.prepend(orderItem); // Utilisez prepend pour ajouter les commandes récentes en premier
+                    }
+                }
+            });
+        }
+
+        // Fonction pour mettre à jour le statut de traitement
+        function updateTraitement(orderId, currentTraitement) {
+            var newTraitement = currentTraitement === 'non' ? 'oui' : 'non';
+            var orderRef = firebase.database().ref('commandes').child(orderId);
+            orderRef.update({ traiter: newTraitement })
+                .then(function() {
+                    getOrders(); // Rafraîchir la liste après la mise à jour
+                })
+                .catch(function(error) {
+                    console.error("Erreur lors de la mise à jour du statut de traitement:", error);
+                });
+        }
+
+        // Appeler la fonction pour récupérer les commandes lors du chargement de la page
+        window.onload = getOrders;
+    </script>
+</body>
+</html>

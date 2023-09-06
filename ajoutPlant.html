@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Plant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group label,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .form-group button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h1>Add Plant</h1>
+        <form id="addPlantForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price:</label>
+                <input type="text" id="price" required>
+            </div>
+
+            <div class="form-group">
+                <label for="availability">Availability:</label>
+                <input type="checkbox" id="availability">
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" required>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Image URL:</label>
+                <input type="text" id="image" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit">Add Plant</button>
+            </div>
+        </form>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            // Your Firebase config here
+            // Your Firebase config details here
+  apiKey: "AIzaSyCXBf41eq-hulIWrHI6d8m3VS9Lu4ZO3ew",
+  authDomain: "sabahnature-79356.firebaseapp.com",
+  databaseURL: "https://sabahnature-79356-default-rtdb.firebaseio.com",
+  projectId: "sabahnature-79356",
+  storageBucket: "sabahnature-79356.appspot.com",
+  messagingSenderId: "192139262635",
+  appId: "1:192139262635:web:e2c8ba4e8928b3fab5d5ee",
+  measurementId: "G-TK1TWMJ88B"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the Firebase Realtime Database
+        const db = firebase.database();
+
+        // Function to handle form submission
+        document.getElementById('addPlantForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const plant = {
+                name: form.elements.name.value,
+                description: form.elements.description.value,
+                price: form.elements.price.value,
+                available: form.elements.availability.checked,
+                quantity: parseInt(form.elements.quantity.value),
+                image: form.elements.image.value,
+            };
+
+            // Add the plant data to the database
+            db.ref('plants').push(plant)
+                .then(() => {
+                    alert('Plant added successfully!');
+                    form.reset();
+                })
+                .catch((error) => {
+                    console.error('Error adding plant:', error);
+                    alert('Error adding plant. Please try again.');
+                });
+        });
+    </script>
+</body>
+
+</html>
